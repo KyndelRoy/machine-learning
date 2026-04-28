@@ -3,12 +3,12 @@ import pandas as pd
 import os
 # Load your translation dataset
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-csv_path = os.path.join(BASE_DIR, '1-10kTag-Eng-Ceb-Kap-Bic.csv')
+csv_path = os.path.join(BASE_DIR, 'combined_languages_6.csv')
 df = pd.read_csv(csv_path)
 
 # Reshape from wide to long format (Text and Language)
 # This will stack all language columns into a single column
-df_reshaped = pd.melt(df, value_vars=['cebuano', 'tagalog', 'english', 'kapampangan', 'bicolano'], 
+df_reshaped = pd.melt(df, value_vars=['cebuano', 'tagalog', 'english', 'kapampangan', 'bicolano', 'other'], 
                     var_name='language', value_name='text')
 
 # Drop any empty rows just in case
@@ -40,11 +40,26 @@ test_sentences = [
     "kung pwede lang dapat pumunta nako don", # Tagalog
     "Nanu ing kailangan kung daptan ngeni", # Kapampangan (Sample)
     "Ano an kaipuhan kong gibuhon ngunyan", # Bicolano (Sample)
-    "Unsay kinahanglan nakong buhaton karon" # Cebuano
+    "Unsay kinahanglan nakong buhaton karon", # Cebuano
+    "ngano naa ka diri bai dili man ta friends",
+    "Mangan tana kening balay na ning koya ku",
+    "Dies ist ein deutscher Satz",               # German
+    "Bonjour, comment ça va aujourd'hui?",        # French
+    "Hola, ¿cómo estás mi querido amigo?",       # Spanish
+    "Watashi wa anata o aishiteimasu",           # Japanese
+    "Привет, как дела?",                         # Russian
+    "Grabe yung traffic kahapon, I was so late for my meeting", # Taglish
+    "Kaon na ta sa school, I'm so hungry na jud",               # Bislish
+    "Actually, kailangan ko na talaga mag-start ng project na ito", # Taglish
+    "Mangan tana but please make sure the food is clean",        # Kapampangan + English
+    "Gusto nako mokaon but wala man koy kwarta",                 # Cebuano + Tagalog mix
+    "12431iuh89 fddkwb 233232 efkj234 f",
+    "xkqz mnjp brtl",
+    "xkqz mnjp brtl i dont know feasufhgui",
 ]
 predictions = model.predict(test_sentences)
 for sent, pred in zip(test_sentences, predictions):
-    print(f"Text: {sent} -> Detected: {pred}")
+    print(f"Detected: {pred} | Text: {sent}")
 
 import joblib
 
