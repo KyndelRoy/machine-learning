@@ -1,7 +1,10 @@
 import pandas as pd
 
+import os
 # Load your translation dataset
-df = pd.read_csv('1-10kTag-Eng-Ceb-Kap-Bic.csv')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(BASE_DIR, '1-10kTag-Eng-Ceb-Kap-Bic.csv')
+df = pd.read_csv(csv_path)
 
 # Reshape from wide to long format (Text and Language)
 # This will stack all language columns into a single column
@@ -10,8 +13,6 @@ df_reshaped = pd.melt(df, value_vars=['cebuano', 'tagalog', 'english', 'kapampan
 
 # Drop any empty rows just in case
 df_reshaped = df_reshaped.dropna()
-
-print(df_reshaped.head())
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -35,7 +36,8 @@ model.fit(X_train, y_train)
 
 # 4. Quick Test
 test_sentences = [
-    "Anong kailangan kong gawin ngayon", # Tagalog
+    "If there are enemies what would our thing for now",
+    "kung pwede lang dapat pumunta nako don", # Tagalog
     "Nanu ing kailangan kung daptan ngeni", # Kapampangan (Sample)
     "Ano an kaipuhan kong gibuhon ngunyan", # Bicolano (Sample)
     "Unsay kinahanglan nakong buhaton karon" # Cebuano
