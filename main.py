@@ -1,24 +1,17 @@
 import pandas as pd
 
-# Load your 5000-row file
-df = pd.read_csv('data.csv')
+# Load your translation dataset
+df = pd.read_csv('1-10kTag-Eng-Ceb-Kap-Bic.csv')
 
-# Reshape from 3 columns to 2 columns (Text and Language)
-# This will turn 5,000 rows into 15,000 rows
-df_reshaped = pd.melt(df, value_vars=['cebuano', 'tagalog', 'english'], 
+# Reshape from wide to long format (Text and Language)
+# This will stack all language columns into a single column
+df_reshaped = pd.melt(df, value_vars=['cebuano', 'tagalog', 'english', 'kapampangan', 'bicolano'], 
                     var_name='language', value_name='text')
 
 # Drop any empty rows just in case
 df_reshaped = df_reshaped.dropna()
 
 print(df_reshaped.head())
-
-
-
-
-
-
-
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -41,10 +34,15 @@ model = Pipeline([
 model.fit(X_train, y_train)
 
 # 4. Quick Test
-test_sentence = "Anong kailangan kong gawin ngayon" 
-prediction = model.predict([test_sentence])
-print(f"Detected: {prediction[0]}")
-
+test_sentences = [
+    "Anong kailangan kong gawin ngayon", # Tagalog
+    "Nanu ing kailangan kung daptan ngeni", # Kapampangan (Sample)
+    "Ano an kaipuhan kong gibuhon ngunyan", # Bicolano (Sample)
+    "Unsay kinahanglan nakong buhaton karon" # Cebuano
+]
+predictions = model.predict(test_sentences)
+for sent, pred in zip(test_sentences, predictions):
+    print(f"Text: {sent} -> Detected: {pred}")
 
 import joblib
 
