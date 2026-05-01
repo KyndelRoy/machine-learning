@@ -5,8 +5,8 @@ import re
 
 nltk.download('stopwords')
 
-INPUT_CSV = "cleaned_combined_text.csv"
-OUTPUT_CSV = "final_cleaned_output.csv"
+INPUT_CSV = "datasets/cleaned_combined_text_15k.csv"
+OUTPUT_CSV = "datasets/final_cleaned_output_15k.csv"
 TEXT_COLUMN = "cleaned_text"
 
 # STOPWORDS SETUP 
@@ -15,68 +15,118 @@ TEXT_COLUMN = "cleaned_text"
 english_stopwords = set(stopwords.words('english'))
 
 shared_ph_stopwords = {
-    "ang", "ng", "mga", "sa", "ay", "ako", "ikaw", "siya", "kami", "tayo", "kayo", "mi", "ko",
-    "nila", "ito", "iyan", "iyon", "dito", "doon", "kasi", "pero", "kung", "para", 
-    "mas", "na", "pa", "ba", "lang", "naman", "pala", "sana", "dahil", "hindi", 
-    "ayon", "dal", "an", "um","kundi","gunit","seem", "atoa","tan",
-    "ano", "sino", "bakit", "saan", "paano", "lahat", "niya", "ko", "mo", "namin",
-    "please", "dont", "alas", "de", "tom", "walang", "taga", "pag", "pwede","kanus", "duha", "every",
-    "much","let", "aw", "saako","bang","hapon","adunaye", "good", "maayo", "pagkatapos", "halos", "believe",
-    "said", "sinabi", "gawin", "tama", "take", "still", "saw", "ninyo", "itong","anthony",
-    "nakita", "importante", "kanunay", "always", "panahon", "time", "oras", "big",
-    "dako", "tomorrow", "ugma", "ngayon", "bukas", "pwede", "pag", "iyaha", "kanya",
-    "work", "trabaho", "talagang", "tinuod", "hapon", "see", "let", "makita",
-    "leave", "taga", "ate", "new", "bago", "bagong", "bang", "kanus", "kailan", 
-    "butang", "bagay", "two", "duha", "dalawang", "little", "tingin", "much",
-    "aw", "isa", "kada", "nothing", "every", "day", "home", "walang","tulo", "three",
-    "years", "happy", "tuig", "stop", "say", "moadto", "going", "went", "pumunta", 
-    "beses", "maliit", "small", "alone", "gamay", "pera", "money", "life", "kinabuhi",
-    "buhay", "house", "bahay", "balay", "ating", "pang", "atong", "oo", "back",
-    "help", "never", "nahitabo", "ginawa", "adunaye", "loob", "nagakaon", "sulod",
-    "kumakain", "eat", "kumain", "us", "everything", "aduna", "morning", "umaga", 
-    "mali", "una", "sayo", "umalis", "everyone", "old", "call", "well", "mabuti", 
-    "magaling", "naging", "afraid", "gumagawa", "lugar", "si", "ga","ka","yan", "iyong",
-    "juan", "john", "antonio", "nestor", "daniel", "maria", "tomas", "leo", "yaroslav",
-    "mary","name", "called", "english", "tagalog", "cebuano","dina","dana","sina","corina"
+    # names
+    "juan", "john", "antonio", "nestor", "daniel", "maria", "tomas", "leo", "yaroslav","tom",
+    "mary","name", "called", "english", "tagalog", "cebuano","dina","dana","sina","corina","roy","sarah","jose","maria",
+    "cairo","alexandria",
+
+    # Pronouns
+    "ako", "ikaw", "siya", "kami", "tayo", "kayo", "mi","kay",
+    "ko", "mo", "nila", "niya", "namin", "ninyo",
+    "ito", "iyan", "iyon", "itong",
+    "si", "sina", "iyong", "iyaha", "kanya", "ka", "yan",
+    "ating", "atong", "atoa",
+
+    # Core particles / markers
+    "ang", "ng", "mga", "sa", "ay",
+    "na", "pa", "ba", "lang", "naman", "pala", "sana",
+    "kasi", "pero", "kung", "para", "mas", "dahil", "hindi",
+    "kundi", "ayon", "bang", "pang", "pag", "taga", "an",
+
+    # Question words (cross-language)
+    "ano", "sino", "bakit", "saan", "paano", "kanus", "kailan",
+
+    # Existential / negation
+    "walang", "aduna", "oo",
+
+    # High-frequency universal quantifiers / determiners
+    "lahat", "isa", "kada",
+
+    # Modal
+    "pwede",
+
+    # Temporal (extremely high-frequency, non-topical)
+    "ngayon",
 }
 
-# Specific to Tagalog (including common particles)
 tagalog_stopwords = {
-    "mag", "po", "opo", "ho", "daw", "raw", "din", "rin", "eh", "kaya", "lamang","rajod","gina" 
-    "ta","nito","nmo","taos", "kayong", "inyong","inyo","kanang", "pagka", "aking","usab","diba"
-    "yata", "tulad", "gaya", "habang", "kapag", "kahit", "wala", "meron", "nako", 
-    "mong", "kang", "talaga", "may", "yang", "nung", "iyang", "kong", "nang", "mu", "naka",
-    "jody", "seemed", "biglang","among", "aming", "giunsa", "gihatag","imo", "imohang",
-    "dapat", "kaysa", "akong", "ayaw", "akin", "nag", "anong", "parang", "sinong", 
-    "nasaan", "akala", "tapos", "done", "huwag", "ganito", "really", "ingon", "ani", "jud",
-    "anyone", "diay", "alanganin", "nato", "natin", "lisud", "lisod", "buong", "araw",
-    "pako", "tibouk", "adlaw", "ilang", "pila", "rito", "dere", "diri", "days", "baka", "basin",
-    "kitang", "without", "sakon", "alam", "know", "kabalo", "sigurado", "sure", "kahibaw", "lalong", "got",
-    "maong", "anything", "koy", "matagal", "long time", "dugay", "think", "murag", "ata", "susunod", "taon", "tuiga", "sunod",
-    "next", "year", "hope", "kahapon", "gahapon", "yesterday", "sadyang", "saakong", "nais", "wanted", "gusto",
-    "pakiramdam", "feeling", "paminaw", "bihira", "rarely", "usahay", "lunes", "mondays"
+    # Particles unique to Tagalog
+    "mag", "po", "opo", "ho", "daw", "raw", "din", "rin", "eh",
+    "kaya", "lamang", "nito",
+    "yata", "tulad", "gaya", "habang", "kapag", "kahit",
+    "wala", "meron", "nako",
+    "mong", "kang", "may", "yang", "nung", "iyang", "kong",
+    "nang", "mu", "naka", "nag",
+
+    # Conjunctions / discourse markers
+    "diba", "tapos", "huwag", "ganito",
+    "baka", "lalong", "parang", "kaysa", "dapat",
+
+    # Pronouns / possessives
+    "aming", "imo", "imohang",
+    "akong", "akin", "ayaw",
+    "nato", "natin", "saakong", "kitang", "sakon",
+
+    # Question words (Tagalog-specific)
+    "anong", "sinong", "nasaan",
+
+    # Cebuano particles frequently mixed in Tagalog text
+    "giunsa", "ani", "jud", "diay",
+    "koy", "murag", "ata",
+
+    # Others
+    "anyone", "anything",
+    "ilang", "pila",
+    "rito", "diri",
+    "noong", "ta",
+    "usab",
 }
 
-# Specific to Cebuano / Bisaya
 cebuano_stopwords = {
-    "ug", "og", "kita", "kamo", "namo", "niini", "kana", "kadto", "dinhi", "didto", 
-    "kay", "man", "ra", "lagi", "bitaw", "unta", "karon", "adto", "unsa", 
-    "ngano", "naa", "abi", "nakog", "nimo", "imong", "walay", "kinsay", "dili", 
-    "usa", "nganong", "akoa", "asa", "sako", "saiyang", "saimong", "gyud", "gi", "tika", "mana",
-    "igna", "humana", "saakoa", "ni", "nimong", "tanan", "kalinaw", "sinumang", "bisan", "kinsa",
-    "silang", "sila", "kailangang", "kailangan", "need", "pud", "kinahanglan",
-    "like", "love", "want", "must", "should", "could", "would", "may", "might", "can", "will", "shall", "no",
-    "i", "you", "he", "she", "it", "we", "they", "a", "an", "the", "of", "in", "on", "at", "to", "for",
-    "from", "with", "by", "about", "as", "is", "are", "was", "were", "not", "had", "one", "do",
-    "go", "gikan", "did", "does", "doin", "didnt", "didn", "kinuha", "nagsulti", 
-    "siyang", "looks", "mura", "humingi", "nga", "aron", "wa", "kon", "napakaraming", 
-    "many", "daghan", "kaayo", "naay", "nasa", "isang", "kanyang", "iyo", "mao",
-    "maraming", "lots", "daghang", "di", "maka", "kog", "lang", "nina", "pero","andong", "yo",
-    "unsay", "ginabuhat", "sabihin", "gagawin", "tell", "unsay", "buhaton", "ana",
-    "masyadong", "stay", "long", "thought","pirmi", "pirme", "nasud", "igo","saman","siyag","yung","rako",
-    "kanila", "uli", "yes", "yun","ta","uy","sige","lage","lagi","giingon", "yata","lng", "maayong",
-    "nagti", "mahilig", "ganahan", "ge","tara", "tra","bajud","saimoha","saimo", "ing","sud", "ana"
-    "mi", "noong", "katong","nung", "nang"
+    # Pronouns
+    "kita", "kamo", "namo", "kog", "nimo", "imong", "akoa",
+    "siyang", "sila", "silang", "kanila",
+    "mao", "iyo", "kanyang",
+    "sako", "saiyang", "saimong",
+    "ta", "rako", "siyag", "saimo",
+
+    # Core Cebuano particles / markers
+    "ug", "og", "ra", "lagi", "lage", "bitaw", "unta", "karon",
+    "man", "nga", "aron", "wa", "kon", "gi", "gyud", "pud",
+    "kaayo", "uy", "sige", "ge", "tara", "tra", "bajud",
+    "naay", "ana", "lng", "yata",
+
+    # Demonstratives / locatives
+    "niini", "kana", "kadto", "dinhi", "didto",
+    "adto", "gikan", "katong",
+
+    # Question words
+    "unsa", "unsay", "ngano", "nganong", "kinsay", "asa",
+
+    # Negation / existential
+    "dili", "di", "walay",
+
+    # Other particles
+    "maka", "abi", "nakog", "tika", "mana",
+    "igna", "humana", "ni", "nimong",
+    "tanan", "bisan", "kinsa",
+    "kailangan", "kinahanglan", "need",
+    "igo", "basin",
+
+    # Tagalog particles common in Cebuano code-switched text
+    "nasa", "isang", "pero", "lang", "nang", "nung", "yung",
+    "nina", "nag",
+
+    # English function words (code-switching is heavy in PH text)
+    "i", "you", "he", "she", "it", "we", "they",
+    "a", "an", "the",
+    "of", "in", "on", "at", "to", "for", "from",
+    "with", "by", "about", "as",
+    "is", "are", "was", "were", "did", "does", "do",
+    "not", "no", "yes", "had", "didnt", "didn",
+
+    # Shared cross-list
+    "mi", "yo", "usa", "yun", "uli",
 }
 
 # Combine all
