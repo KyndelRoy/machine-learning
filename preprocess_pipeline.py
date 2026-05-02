@@ -6,7 +6,7 @@ import re
 nltk.download('stopwords', quiet=True)
 
 INPUT_CSV = "datasets/original_dataset.csv"
-OUTPUT_CSV = "datasets/normalized_dataset.csv"
+OUTPUT_CSV = "datasets/preprocessed_dataset.csv"
 OUTPUT_COLUMN = "text"
 
 # STOPWORDS SETUP 
@@ -184,11 +184,11 @@ def clean_text(text):
     # 6. Remove extra whitespaces
     text = re.sub(r"\s+", " ", text).strip()
 
-    # # 7. Remove Stopwords
-    # words = text.split()
-    # filtered_words = [w for w in words if w not in all_stopwords]
+    # 7. Remove Stopwords
+    words = text.split()
+    filtered_words = [w for w in words if w not in all_stopwords]
 
-    # return " ".join(filtered_words)
+    return " ".join(filtered_words)
 
 def preprocess_pipeline(input_csv, output_csv):
     print(f"Loading input file: {input_csv}")

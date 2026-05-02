@@ -21,7 +21,7 @@ shared_ph_stopwords = {
     "cairo","alexandria",
 
     # Pronouns
-    "ako", "ikaw", "siya", "kami", "tayo", "kayo", "mi","kay",
+    "ako", "ikaw", "siya", "kami", "tayo", "kayo", "mi","kay"
     "ko", "mo", "nila", "niya", "namin", "ninyo",
     "ito", "iyan", "iyon", "itong",
     "si", "sina", "iyong", "iyaha", "kanya", "ka", "yan",
