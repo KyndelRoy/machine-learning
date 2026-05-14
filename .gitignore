@@ -19,6 +19,9 @@ output/embeddings.npy
 output/data_with_topics.csv
 saved_model/
 
+# Artifacts/Log files
+*.log
+
 # Misc
 *.pkl
 *_output.csv

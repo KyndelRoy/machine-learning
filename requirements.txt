@@ -1,7 +1,0 @@
-bertopic
-sentence-transformers
-hdbscan
-umap-learn
-pandas
-numpy
-torch

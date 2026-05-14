@@ -1,0 +1,13 @@
+{
+  "num_topics": 176,
+  "num_documents": 9834,
+  "num_outliers": 387,
+  "outlier_percentage": 3.94,
+  "topic_diversity": 0.8432,
+  "min_topic_size_setting": 15,
+  "avg_topic_size": 53.7,
+  "median_topic_size": 48.5,
+  "max_topic_size": 261,
+  "min_topic_size_actual": 18,
+  "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+}
